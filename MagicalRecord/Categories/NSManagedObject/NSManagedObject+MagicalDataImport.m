@@ -211,13 +211,11 @@ NSString * const kMagicalRecordImportAttributeUseDefaultValueWhenNotPresent = @"
     {
         [self willImport:objectData];
     }
-    MR_swapMethodsFromClass([objectData class], @selector(valueForUndefinedKey:), @selector(MR_valueForUndefinedKey:));
     return YES;
 }
 
 - (BOOL) MR_postImport:(id)objectData;
 {
-    MR_swapMethodsFromClass([objectData class], @selector(valueForUndefinedKey:), @selector(MR_valueForUndefinedKey:));
     if ([self respondsToSelector:@selector(didImport:)])
     {
         [self performSelector:@selector(didImport:) withObject:objectData];
