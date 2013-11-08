@@ -33,14 +33,23 @@ NSDate * adjustDateForDST(NSDate *date)
 
 NSDate * dateFromString(NSString *value, NSString *format)
 {
-    NSDateFormatter *formatter = [[NSDateFormatter alloc] init];
-    [formatter setTimeZone:[NSTimeZone timeZoneWithName:@"GMT"]];
-    [formatter setLocale:[NSLocale currentLocale]];
-    [formatter setDateFormat:format];
+    static NSMutableDictionary *cache;
+    static dispatch_once_t onceToken;
+    dispatch_once(&onceToken, ^{
+        cache = [NSMutableDictionary dictionary];
+    });
     
-    NSDate *parsedDate = [formatter dateFromString:value];
+    NSDateFormatter *formatter = cache[format];
+    if (!formatter) {
+        formatter = [[NSDateFormatter alloc] init];
+        [formatter setTimeZone:[NSTimeZone timeZoneWithName:@"GMT"]];
+        [formatter setLocale:[NSLocale currentLocale]];
+        [formatter setDateFormat:format];
+        
+        cache[format] = formatter;
+    }
     
-    return parsedDate;
+    return [formatter dateFromString:value];
 }
 
 NSNumber * numberFromString(NSString *value) {
